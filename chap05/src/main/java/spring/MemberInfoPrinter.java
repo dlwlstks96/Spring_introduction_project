@@ -1,7 +1,10 @@
 package spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+@Component("infoPrinter")
 public class MemberInfoPrinter {
 
     private MemberDao memberDao;
@@ -23,6 +26,7 @@ public class MemberInfoPrinter {
     }
 
     @Autowired
+    @Qualifier("printer")
     public void setPrinter(MemberPrinter printer) {
         this.printer = printer;
     }

@@ -1,5 +1,8 @@
 package spring;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+
+@Qualifier("printer")
 public class MemberPrinter {
 
     public void print(Member member) {

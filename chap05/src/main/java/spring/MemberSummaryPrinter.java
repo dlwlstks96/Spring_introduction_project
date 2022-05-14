@@ -1,5 +1,8 @@
 package spring;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+
+@Qualifier("summaryPrinter")
 public class MemberSummaryPrinter extends MemberPrinter {
 
     @Override
