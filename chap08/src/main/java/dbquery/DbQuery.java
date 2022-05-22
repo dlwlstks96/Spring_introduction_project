@@ -17,7 +17,7 @@ public class DbQuery {
     public int count() {
         Connection conn = null;
         try {
-            conn = dataSource.getConnection() //풀에서 커넥션 구함
+            conn = dataSource.getConnection();//풀에서 커넥션 구함
             try (Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery("select count(*) from MEMBER")) {
                 rs.next();
