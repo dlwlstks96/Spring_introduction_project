@@ -1,11 +1,13 @@
 package spring;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -42,12 +44,35 @@ public class MemberDao {
         return results.isEmpty() ? null : results.get(0);
     }
 
-    public void insert(Member member) {
-
+    //keyHolder 사용하면 삽입하는 Member 객체의 ID 값을 알 수 있다.
+    //ID 값은 AUTO_INCREMENT 로 자동 증가 칼럼
+    public void insert(final Member member) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement pstmt = con.prepareStatement(
+                        "insert into MEMBER (EMAIL, PASSWORD, NAME, REGDATE) " +
+                                "values (?, ?, ?, ?)",
+                        new String[]{"ID"});
+                pstmt.setString(1, member.getEmail());
+                pstmt.setString(2, member.getPassword());
+                pstmt.setString(3, member.getName());
+                pstmt.setTimestamp(4,
+                        Timestamp.valueOf(member.getRegisterDateTime()));
+                return pstmt;
+            }
+            }, keyHolder);
+        Number keyValue = keyHolder.getKey();
+        member.setId(keyValue.longValue());
     }
 
+    //INSERT, UPDATE, DELETE 쿼리는 update() 메소드 이용
     public void update(Member member) {
-
+        jdbcTemplate.update(
+                "update MEMBER set NAME = ?, PASSWORD = ? where EMAIL = ?",
+                member.getName(), member.getPassword(), member.getEmail()
+        );
     }
 
     public List<Member> selectAll() {
@@ -66,6 +91,14 @@ public class MemberDao {
                     }
                 });
         return results;
+    }
+
+    //결과가 1행인 경우에만 queryForObject 이용해 간단히 결과 받을 수 있음
+    public int count() {
+        Integer count = jdbcTemplate.queryForObject(
+                "select count(*) from MEMBER", Integer.class
+        );
+        return count;
     }
 
 }
