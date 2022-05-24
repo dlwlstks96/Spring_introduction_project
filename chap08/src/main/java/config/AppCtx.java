@@ -19,7 +19,7 @@ public class AppCtx {
         ds.setUsername("spring5");
         ds.setPassword("spring5");
         ds.setInitialSize(2);
-        ds.setMaxActive(10);
+        ds.setMaxActive(100);
         return ds;
     }
 
