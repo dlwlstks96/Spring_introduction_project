@@ -18,8 +18,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.apache.tomcat:tomcat-jdbc:10.1.0-M15'
+	implementation 'org.slf4j:slf4j-api:1.7.30'
 	runtimeOnly 'mysql:mysql-connector-java'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'ch.qos.logback:logback-classic:1.2.3'
 }
 
 tasks.named('test') {

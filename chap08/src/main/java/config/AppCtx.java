@@ -3,9 +3,14 @@ package config;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import spring.ChangePasswordService;
 import spring.MemberDao;
 
 @Configuration
+@EnableTransactionManagement
 public class AppCtx {
 
     //스프링이 제공하는 DB 연동 기능은 DataSource 를 사용해서 DB Connection 을 구함
@@ -14,7 +19,7 @@ public class AppCtx {
     @Bean(destroyMethod = "close")
     public DataSource dataSource() {
         DataSource ds = new DataSource(); //DataSource 객체 생성
-        ds.setDriverClassName("com.mysql.jdbc.Driver");
+        ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
         ds.setUrl("jdbc:mysql://localhost/spring5s?characterEncoding=utf8");
         ds.setUsername("spring5");
         ds.setPassword("spring5");
@@ -24,8 +29,22 @@ public class AppCtx {
     }
 
     @Bean
+    public PlatformTransactionManager transactionManager() {
+        DataSourceTransactionManager tm = new DataSourceTransactionManager();
+        tm.setDataSource(dataSource());
+        return tm;
+    }
+
+    @Bean
     public MemberDao memberDao() {
         return new MemberDao(dataSource());
+    }
+
+    @Bean
+    public ChangePasswordService changePwdSvc() {
+        ChangePasswordService pwdSvc = new ChangePasswordService();
+        pwdSvc.setMemberDao(memberDao());
+        return pwdSvc;
     }
 
 }

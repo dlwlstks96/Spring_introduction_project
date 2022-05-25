@@ -12,7 +12,7 @@ public class DbConfig {
     @Bean(destroyMethod = "close")
     public DataSource dataSource() {
         DataSource ds = new DataSource(); //DataSource 객체 생성
-        ds.setDriverClassName("com.mysql.jdbc.Driver"); //JDBC 드라이버 클래스를 mysql 드라이버 클래스로 사용
+        ds.setDriverClassName("com.mysql.cj.jdbc.Driver"); //JDBC 드라이버 클래스를 mysql 드라이버 클래스로 사용
         //JDBC URL 지정
         ds.setUrl("jdbc:mysql://localhost/spring5fs?characterEncoding=utf8");
         ds.setUsername("spring5");
