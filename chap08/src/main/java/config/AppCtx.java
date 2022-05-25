@@ -6,25 +6,30 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 import spring.ChangePasswordService;
 import spring.MemberDao;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberPrinter;
+import spring.MemberRegisterService;
 
 @Configuration
 @EnableTransactionManagement
 public class AppCtx {
 
-    //스프링이 제공하는 DB 연동 기능은 DataSource 를 사용해서 DB Connection 을 구함
-    //DB 연동에 사용할 DataSource 를 스프링 빈으로 등록하고 DB 연동 기능을 구현한
-    //Bean 객체는 DataSource 를 주입 받아 사용한다.
     @Bean(destroyMethod = "close")
     public DataSource dataSource() {
-        DataSource ds = new DataSource(); //DataSource 객체 생성
-        ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        ds.setUrl("jdbc:mysql://localhost/spring5s?characterEncoding=utf8");
+        DataSource ds = new DataSource();
+        ds.setDriverClassName("com.mysql.jdbc.Driver");
+        ds.setUrl("jdbc:mysql://localhost/spring5fs?characterEncoding=utf8");
         ds.setUsername("spring5");
         ds.setPassword("spring5");
         ds.setInitialSize(2);
-        ds.setMaxActive(100);
+        ds.setMaxActive(10);
+        ds.setTestWhileIdle(true);
+        ds.setMinEvictableIdleTimeMillis(60000 * 3);
+        ds.setTimeBetweenEvictionRunsMillis(10 * 1000);
         return ds;
     }
 
@@ -41,10 +46,32 @@ public class AppCtx {
     }
 
     @Bean
+    public MemberRegisterService memberRegSvc() {
+        return new MemberRegisterService(memberDao());
+    }
+
+    @Bean
     public ChangePasswordService changePwdSvc() {
         ChangePasswordService pwdSvc = new ChangePasswordService();
         pwdSvc.setMemberDao(memberDao());
         return pwdSvc;
     }
 
+    @Bean
+    public MemberPrinter memberPrinter() {
+        return new MemberPrinter();
+    }
+
+    @Bean
+    public MemberListPrinter listPrinter() {
+        return new MemberListPrinter(memberDao(), memberPrinter());
+    }
+
+    @Bean
+    public MemberInfoPrinter infoPrinter() {
+        MemberInfoPrinter infoPrinter = new MemberInfoPrinter();
+        infoPrinter.setMemberDao(memberDao());
+        infoPrinter.setPrinter(memberPrinter());
+        return infoPrinter;
+    }
 }
