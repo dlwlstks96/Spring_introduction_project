@@ -7,6 +7,8 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+//edit configuration 에서 tomcat path 를 webapp 폴더로
+//설정해줘야 정상적으로 viewResolver 작동
 @Configuration
 @EnableWebMvc
 public class MvcConfig implements WebMvcConfigurer {
