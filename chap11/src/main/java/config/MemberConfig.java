@@ -18,7 +18,7 @@ public class MemberConfig {
 	@Bean(destroyMethod = "close")
 	public DataSource dataSource() {
 		DataSource ds = new DataSource();
-		ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+		ds.setDriverClassName("com.mysql.jdbc.Driver");
 		ds.setUrl("jdbc:mysql://localhost/spring5s?characterEncoding=utf8");
 		ds.setUsername("spring5");
 		ds.setPassword("spring5");
