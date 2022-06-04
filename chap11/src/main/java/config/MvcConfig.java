@@ -24,4 +24,11 @@ public class MvcConfig implements WebMvcConfigurer {
 		registry.jsp("/WEB-INF/view/", ".jsp");
 	}
 
+	//webMvcConfigurer의 addViewControllers 메소드를 재정의하면
+	// 컨트롤러 구현 없이 요청 경로와 뷰 이름을 연결할 수 있다.
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addViewController("/main").setViewName("main");
+	}
+
 }
