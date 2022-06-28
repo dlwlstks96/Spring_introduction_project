@@ -1,9 +1,11 @@
 package config;
 
+import controller.RegisterRequestValidator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.validation.Validator;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -43,6 +45,13 @@ public class MvcConfig implements WebMvcConfigurer {
 		ms.setBasenames("message.label");
 		ms.setDefaultEncoding("UTF-8");
 		return ms;
+	}
+
+	//스프링 MVC는 WebMvcConfigurer 인터페이스의 getValidator() 메소드가
+	//리턴한 객체를 글로벌 범위 Validator로 사용
+	@Override
+	public Validator getValidator() {
+		return new RegisterRequestValidator();
 	}
 
 }

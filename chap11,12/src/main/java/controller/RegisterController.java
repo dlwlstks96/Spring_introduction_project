@@ -11,6 +11,8 @@ import spring.DuplicateMemberException;
 import spring.MemberRegisterService;
 import spring.RegisterRequest;
 
+import javax.validation.Valid;
+
 @Controller
 public class RegisterController {
 
@@ -41,7 +43,7 @@ public class RegisterController {
     //RegisterRequest 는 /java/spring 폴더 내의 직접 작성한 클래스
     //스프링은 요청 파라미터의 값을 커맨드 객체에 담아준다
     @PostMapping("/register/step3")
-    public String handleStep3(RegisterRequest regReq, Errors errors) {
+    public String handleStep3(@Valid RegisterRequest regReq, Errors errors) {
         new RegisterRequestValidator().validate(regReq, errors);
         if (errors.hasErrors())
             return "register/step2";
