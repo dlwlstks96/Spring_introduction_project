@@ -3,10 +3,8 @@ package controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 import spring.DuplicateMemberException;
 import spring.MemberRegisterService;
 import spring.RegisterRequest;
@@ -63,6 +61,11 @@ public class RegisterController {
         return "redirect:/register/step1";
     }
 
-
+    //WebDataBinder.setValidator() 메소드 이용해서 컨트롤러 범위에
+    //적용할 Validator 설정할 수 있다
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(new RegisterRequestValidator());
+    }
 
 }
