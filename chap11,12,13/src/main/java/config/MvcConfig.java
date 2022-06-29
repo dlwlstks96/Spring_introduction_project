@@ -1,16 +1,13 @@
 package config;
 
 import controller.RegisterRequestValidator;
+import interceptor.AuthCheckInterceptor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.Validator;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 //edit configuration 에서 tomcat path 를 webapp 폴더로
 //설정해줘야 정상적으로 viewResolver 작동
@@ -52,6 +49,19 @@ public class MvcConfig implements WebMvcConfigurer {
 	@Override
 	public Validator getValidator() {
 		return new RegisterRequestValidator();
+	}
+
+	//인터셉터를 설정하는 메소드
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(authCheckInterceptor()) //HandlerInterceptor 객체를 설정
+				.addPathPatterns("/edit/**"); //addInterceptor() 메소드는 InterceptorRegistration 객체를 리턴하는데
+											  //이 객체의 addPathPatterns() 메소드는 인터셉터를 적용할 경로 패턴을 지정
+	}
+
+	@Bean
+	public AuthCheckInterceptor authCheckInterceptor() {
+		return new AuthCheckInterceptor();
 	}
 
 }
