@@ -8,6 +8,7 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -99,6 +100,28 @@ public class MemberDao {
                 "select count(*) from MEMBER", Integer.class
         );
         return count;
+    }
+
+    //REGDATE 값이 from과 to 사이에 있는 MEMBER 목록을 구한다.
+    public List<Member> selectByRegdate(
+            LocalDateTime from, LocalDateTime to) {
+        List<Member> results = jdbcTemplate.query(
+                "select * from MEMBER where REGDATE between ? and ? " +
+                        "order by REGDATE desc",
+                new RowMapper<Member>() {
+                    @Override
+                    public Member mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        Member member = new Member(
+                                rs.getString("EMAIL"),
+                                rs.getString("PASSWORD"),
+                                rs.getString("NAME"),
+                                rs.getTimestamp("REGDATE").toLocalDateTime());
+                        member.setId(rs.getLong("ID"));
+                        return member;
+                    }
+                },
+                from,to);
+        return results;
     }
 
 }
