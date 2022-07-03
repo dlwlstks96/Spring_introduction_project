@@ -1,13 +1,18 @@
 package spring;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 
 public class Member {
 
     private Long id;
     private String email;
+    @JsonIgnore //Json 응답에 포함시키지 않음
     private String password;
     private String name;
+    //@JsonFormat(pattern = "yyyyMMddHHmmss")
     private LocalDateTime registerDateTime;
 
     public Member(String email, String password,
