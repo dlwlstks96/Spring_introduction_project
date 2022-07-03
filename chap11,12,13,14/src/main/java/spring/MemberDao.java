@@ -17,6 +17,19 @@ import java.util.Map;
 public class MemberDao {
 
     private JdbcTemplate jdbcTemplate;
+    //RowMapper 생성 코드의 중복을 제거하기 위함
+    private RowMapper<Member> memRowMapper =
+            new RowMapper<Member>() {
+                @Override
+                public Member mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    Member member = new Member(rs.getString("EMAIL"),
+                            rs.getString("PASSWORD"),
+                            rs.getString("NAME"),
+                            rs.getTimestamp("REGDATE").toLocalDateTime());
+                    member.setId(rs.getLong("ID"));
+                    return member;
+                }
+            };
 
     //MemberDao 클래스에 JdbcTemplate 객체 생성
     public MemberDao(DataSource dataSource) {
@@ -28,20 +41,8 @@ public class MemberDao {
     public Member selectByEmail(String email) {
         List<Member> results = jdbcTemplate.query(
                 "select * from MEMBER where EMAIL = ?",
-                new RowMapper<Member>() { //임의 클래스
-                    @Override
-                    public Member mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        Member member = new Member(
-                                rs.getString("EMAIL"),
-                                rs.getString("PASSWORD"),
-                                rs.getString("NAME"),
-                                rs.getTimestamp("REGDATE").toLocalDateTime()
-                        );
-                        member.setId(rs.getLong("ID"));
-                        return member;
-                    }
-                },
-                email);
+                    memRowMapper, email);
+
         return results.isEmpty() ? null : results.get(0);
     }
 
@@ -77,20 +78,7 @@ public class MemberDao {
     }
 
     public List<Member> selectAll() {
-        List<Member> results = jdbcTemplate.query("select * from MEMBER",
-                new RowMapper<Member>() {
-                    @Override
-                    public Member mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        Member member = new Member(
-                                rs.getString("EMAIL"),
-                                rs.getString("PASSWORD"),
-                                rs.getString("NAME"),
-                                rs.getTimestamp("REGDATE").toLocalDateTime()
-                        );
-                        member.setId(rs.getLong("ID"));
-                        return member;
-                    }
-                });
+        List<Member> results = jdbcTemplate.query("select * from MEMBER", memRowMapper);
         return results;
     }
 
@@ -107,21 +95,16 @@ public class MemberDao {
             LocalDateTime from, LocalDateTime to) {
         List<Member> results = jdbcTemplate.query(
                 "select * from MEMBER where REGDATE between ? and ? " +
-                        "order by REGDATE desc",
-                new RowMapper<Member>() {
-                    @Override
-                    public Member mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        Member member = new Member(
-                                rs.getString("EMAIL"),
-                                rs.getString("PASSWORD"),
-                                rs.getString("NAME"),
-                                rs.getTimestamp("REGDATE").toLocalDateTime());
-                        member.setId(rs.getLong("ID"));
-                        return member;
-                    }
-                },
-                from,to);
+                        "order by REGDATE desc", memRowMapper, from,to);
         return results;
+    }
+
+    public Member selectById(Long memId) {
+        List<Member> results = jdbcTemplate.query(
+                "select * from MEMBER where ID = ?",
+                memRowMapper, memId
+        );
+        return results.isEmpty() ? null : results.get(0);
     }
 
 }
