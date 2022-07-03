@@ -1,13 +1,12 @@
 package controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-import spring.Member;
-import spring.MemberDao;
-import spring.MemberRegisterService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import spring.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,29 +16,46 @@ import java.util.List;
 public class RestMemberController {
 
     private MemberDao memberDao;
-    private MemberRegisterService memberRegisterService;
+    private MemberRegisterService registerService;
 
     @GetMapping("/api/members")
     public List<Member> members() {
         return memberDao.selectAll();
     }
 
+    //응답 처리 결과가 정상 혹은 비정상일 경우 둘 다 JSON으로 응답하기 위해
+    //그렇지 않으면 이전에는 정상일땐 JSON, 비정상일땐 HTML로 응답했다.
     @GetMapping("/api/members/{id}")
-    public Member member(@PathVariable Long id,
-                         HttpServletResponse response) throws IOException {
+    public ResponseEntity<Object> member(@PathVariable Long id) {
         Member member = memberDao.selectById(id);
         if (member == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("no member"));
         }
-        return member;
+        return ResponseEntity.status(HttpStatus.OK).body(member); //ResponseEntity.status(상태 코드).body(객체)
     }
+
+    //Json 형식으로 전송된 요청 데이터를 커맨드 객체로 전달받는 방법은
+    //커맨드 객체에 @RequestBody 애노테이션만 붙이면 된다.
+    @PostMapping("/api/members")
+    public void newMember(
+            @RequestBody @Valid RegisterRequest regReq,
+            HttpServletResponse response) throws IOException {
+        try {
+            Long newMemberId = registerService.regist(regReq);
+            response.setHeader("Location", "/api/members/" + newMemberId);
+            response.setStatus(HttpServletResponse.SC_CREATED);
+        } catch (DuplicateMemberException dupEx) {
+            response.sendError(HttpServletResponse.SC_CONFLICT);
+        }
+    }
+
 
     public void setMemberDao(MemberDao memberDao) {
         this.memberDao = memberDao;
     }
 
-    public void setMemberRegisterService(MemberRegisterService memberRegisterService) {
-        this.memberRegisterService = memberRegisterService;
+    public void setMemberRegisterService(MemberRegisterService registerService) {
+        this.registerService = registerService;
     }
 }
